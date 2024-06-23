@@ -1,10 +1,10 @@
-using Auth.Data;
+using Auth.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace Auth
 {
-	public class Program
+    public class Program
 	{
 		public static void Main(string[] args)
 		{
