@@ -63,6 +63,9 @@ namespace Auth.Areas.Identity.Pages.Account.Manage
             [Phone]
             [Display(Name = "Phone number")]
             public string PhoneNumber { get; set; }
+            
+            [Display(Name = "Profile Picture")]
+            public byte[] ProfilePicture { get; set; }
         }
 
         private async Task LoadAsync(ApplicationUser user)
@@ -76,7 +79,8 @@ namespace Auth.Areas.Identity.Pages.Account.Manage
             {
                 FirstName = user.FirstName,
                 LastName = user.LastName,
-                PhoneNumber = phoneNumber
+                PhoneNumber = phoneNumber,
+                ProfilePicture = user.ProfilePicture
             };
         }
 
@@ -106,13 +110,7 @@ namespace Auth.Areas.Identity.Pages.Account.Manage
                 return Page();
             }
 
-            //if (Input.FirstName != user.FirstName || Input.LastName != user.LastName)
-            //{
-            //    user.FirstName = Input.FirstName;
-            //    user.LastName = Input.LastName;
-            //    await _userManager.UpdateAsync(user);
-            //}
-
+            
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
             if (Input.FirstName != user.FirstName || Input.LastName != user.LastName || Input.PhoneNumber != phoneNumber)
             {
@@ -124,6 +122,18 @@ namespace Auth.Areas.Identity.Pages.Account.Manage
                     StatusMessage = "Unexpected error when trying to set phone number.";
                     return RedirectToPage();
                 }
+            }
+
+            if(Request.Form.Files.Count > 0)
+            {
+                var file = Request.Form.Files.FirstOrDefault();
+                //check file size and extension
+                using (var dataStream = new MemoryStream())
+                {
+                    await file.CopyToAsync(dataStream);
+                    user.ProfilePicture = dataStream.ToArray();
+                }
+                await _userManager.UpdateAsync(user);
             }
 
             await _signInManager.RefreshSignInAsync(user);
