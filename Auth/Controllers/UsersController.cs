@@ -125,5 +125,11 @@ namespace Auth.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        public async Task<IActionResult> CheckEmail(string email)
+        {
+            if (await _userManager.FindByEmailAsync(email) == null)
+                return Json(true);
+            return Json(false);
+        }
     }
 }

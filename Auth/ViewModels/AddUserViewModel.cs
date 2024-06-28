@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 
 namespace Auth.ViewModels
 {
@@ -17,6 +18,7 @@ namespace Auth.ViewModels
         [Required]
         [EmailAddress]
         [Display(Name = "Email")]
+        [Remote("CheckEmail" ,"Users", AdditionalFields ="email" , ErrorMessage = "Email is already exists!")]
         public string Email { get; set; }
         
         [Required]
