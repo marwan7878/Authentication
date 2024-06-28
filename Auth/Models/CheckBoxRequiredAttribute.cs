@@ -12,7 +12,7 @@ namespace Auth.Models
             {
                 return ValidationResult.Success;
             }
-            return new ValidationResult("Select at least one role!!!!!");
+            return new ValidationResult("Select at least one role!!");
         }
     }
 }

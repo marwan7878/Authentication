@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Auth.Models;
+using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 
 namespace Auth.ViewModels
@@ -18,7 +19,7 @@ namespace Auth.ViewModels
         [Required]
         [EmailAddress]
         [Display(Name = "Email")]
-        [Remote("CheckEmail" ,"Users", AdditionalFields ="email" , ErrorMessage = "Email is already exists!")]
+        [Remote("CheckEmail" ,"Users", ErrorMessage = "Email is already exists!")]
         public string Email { get; set; }
         
         [Required]
@@ -38,6 +39,7 @@ namespace Auth.ViewModels
 
         
         [Display(Name = "Roles")]
+        [CheckBoxRequired]
         public List<RoleViewModel> Roles { get; set; }
 
     }

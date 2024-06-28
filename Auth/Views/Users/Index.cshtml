@@ -25,11 +25,11 @@
                 <td>@user.FirstName</td>
                 <td>@user.LastName</td>
                 <td>@user.Username</td>
-                <td>@user.Username</td>
+                <td>@user.Email</td>
                 <td>@string.Join(" , ",user.Roles.ToList())</td>
                 <td>
-                    @* <a class="btn btn-primary" asp-controller="Users" asp-action="ManageRoles" asp-route-UserId="@user.Id">Manage Roles</a> *@
                     <a class="btn btn-secondary" asp-controller="Users" asp-action="Edit" asp-route-UserId="@user.Id">Edit</a>
+                    <a class="btn btn-danger" asp-controller="Users" asp-action="Delete" asp-route-UserId="@user.Id">Delete</a>
                 </td>
             </tr>
         }

@@ -70,6 +70,8 @@ namespace Auth.Controllers
                     await _userManager.RemoveFromRoleAsync(user,role.RoleName);
                 if(userRoles.Any(r => r != role.RoleName) && role.IsSelected)
                     await _userManager.AddToRoleAsync(user,role.RoleName);
+                if (userRoles.Count == 0 && role.IsSelected)
+                    await _userManager.AddToRoleAsync(user, role.RoleName);
             }
             return RedirectToAction(nameof(Index));
         }
@@ -159,7 +161,13 @@ namespace Auth.Controllers
             };
             return View(userVM);
         }
-
+        public async Task<IActionResult> CheckEmailInEdit(string email ,string id)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user != null && user != await _userManager.FindByIdAsync(id))
+               return Json(false);
+            return Json(true);
+        }
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(EditUserViewModel model)
@@ -167,15 +175,15 @@ namespace Auth.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
-            if (!model.Roles.Any(r => r.IsSelected))
-            {
-                ModelState.AddModelError("Roles", "Please select at least one role");
-                return View(model);
-            }
-
-
             var user = await _userManager.FindByIdAsync(model.Id);
+
             if (user == null) return NotFound();
+
+
+            user.FirstName = model.FirstName;
+            user.LastName = model.LastName;
+            user.Email = model.Email;
+            user.UserName= model.Username;
 
             await _userManager.UpdateAsync(user);
 
@@ -186,7 +194,21 @@ namespace Auth.Controllers
                     await _userManager.RemoveFromRoleAsync(user, role.RoleName);
                 if (userRoles.Any(r => r != role.RoleName) && role.IsSelected)
                     await _userManager.AddToRoleAsync(user, role.RoleName);
+                if(userRoles.Count == 0 && role.IsSelected)
+                    await _userManager.AddToRoleAsync(user, role.RoleName);
             }
+            return RedirectToAction(nameof(Index));
+        }
+
+        public async Task<IActionResult> Delete(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null) return NotFound();
+
+            await _userManager.DeleteAsync(user);
+
+            foreach (var role in _userManager.GetRolesAsync(user).Result)
+                _userManager.RemoveFromRoleAsync(user, role);
             return RedirectToAction(nameof(Index));
         }
     }
