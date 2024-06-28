@@ -3,7 +3,10 @@ using Auth.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
+using System.Net.Mail;
+using System.Security.Cryptography.Xml;
 
 namespace Auth.Controllers
 {
@@ -68,6 +71,57 @@ namespace Auth.Controllers
                 if(userRoles.Any(r => r != role.RoleName) && role.IsSelected)
                     await _userManager.AddToRoleAsync(user,role.RoleName);
             }
+            return RedirectToAction(nameof(Index));
+        }
+
+        public async Task<IActionResult> Create()
+        {
+            var roles = await _roleManager.Roles.Select(role => new RoleViewModel { 
+                RoleId=role.Id,
+                RoleName=role.Name
+            }).ToListAsync();
+            var viewModel = new AddUserViewModel
+            {
+                Roles = roles
+            };
+            return View(viewModel);
+        }
+        [HttpPost]
+        [AutoValidateAntiforgeryToken]
+        public async Task<IActionResult> Create(AddUserViewModel userVM)
+        {
+            if (!ModelState.IsValid) return View(ModelState);
+            
+            if (!userVM.Roles.Any(r => r.IsSelected))
+            {
+                ModelState.AddModelError("Roles","Please select at least one role");
+                return View(userVM);
+            }
+            if(await _userManager.FindByEmailAsync(userVM.Email) != null)
+            {
+                ModelState.AddModelError("Email","This email is already exists!");
+                return View(userVM);
+            }
+            var user = new ApplicationUser
+            {
+                UserName = new MailAddress(userVM.Email).User,
+                Email = userVM.Email,
+                FirstName = userVM.FirstName,
+                LastName = userVM.LastName,
+            };
+            var result = await _userManager.CreateAsync(user, userVM.Password);
+            
+            if(!result.Succeeded)
+            {
+                foreach(var error in  result.Errors)
+                {
+                    ModelState.AddModelError("Roles", error.Description);
+                }
+                return View(userVM);
+            }
+
+            await _userManager.AddToRolesAsync(user, userVM.Roles.Where(r=>r.IsSelected).Select(r=>r.RoleName));
+
             return RedirectToAction(nameof(Index));
         }
 
