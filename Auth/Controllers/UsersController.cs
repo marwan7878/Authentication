@@ -94,21 +94,6 @@ namespace Auth.Controllers
         {
             if (!ModelState.IsValid) return View(userVM);
             
-            if (!userVM.Roles.Any(r => r.IsSelected))
-            {
-                ModelState.AddModelError("Roles","Please select at least one role");
-                return View(userVM);
-            }
-            if(await _userManager.FindByEmailAsync(userVM.Email) != null)
-            {
-                ModelState.AddModelError("Email","This email is already exists!");
-                return View(userVM);
-            }
-            if(await _userManager.FindByNameAsync(userVM.Email) != null)
-            {
-                ModelState.AddModelError("Username","This username is already exists!");
-                return View(userVM);
-            }
             var user = new ApplicationUser
             {
                 UserName = new MailAddress(userVM.Email).User,
@@ -138,6 +123,12 @@ namespace Auth.Controllers
                 return Json(true);
             return Json(false);
         }
+        public async Task<IActionResult> CheckUsername(string username)
+        {
+            if (await _userManager.FindByNameAsync(username) == null)
+                return Json(true);
+            return Json(false);
+        }
 
         public async Task<IActionResult> Edit(string userId)
         {
@@ -164,6 +155,13 @@ namespace Auth.Controllers
         public async Task<IActionResult> CheckEmailInEdit(string email ,string id)
         {
             var user = await _userManager.FindByEmailAsync(email);
+            if (user != null && user != await _userManager.FindByIdAsync(id))
+               return Json(false);
+            return Json(true);
+        }
+        public async Task<IActionResult> CheckUsernameInEdit(string username ,string id)
+        {
+            var user = await _userManager.FindByNameAsync(username);
             if (user != null && user != await _userManager.FindByIdAsync(id))
                return Json(false);
             return Json(true);

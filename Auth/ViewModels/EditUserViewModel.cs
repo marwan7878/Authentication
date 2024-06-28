@@ -26,6 +26,7 @@ namespace Auth.ViewModels
         
         [Required]
         [Display(Name = "User Name")]
+        [Remote("CheckUsernameInEdit", "Users", AdditionalFields = "Id", ErrorMessage = "Email is already exists!")]
         public string Username { get; set; }
 
         

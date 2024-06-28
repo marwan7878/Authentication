@@ -24,6 +24,7 @@ namespace Auth.ViewModels
         
         [Required]
         [Display(Name = "User Name")]
+        [Remote("CheckUsername", "Users", ErrorMessage = "Username is already exists!")]
         public string Username { get; set; }
 
         [Required]
