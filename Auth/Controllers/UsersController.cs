@@ -21,6 +21,7 @@ namespace Auth.Controllers
             _userManager = userManager;
             _roleManager = roleManager;
         }
+        
         public async Task<IActionResult> Index()
         {
             List<UserViewModel> users = await _userManager.Users.Select(user=> new UserViewModel
@@ -96,7 +97,7 @@ namespace Auth.Controllers
             
             var user = new ApplicationUser
             {
-                UserName = new MailAddress(userVM.Email).User,
+                UserName = userVM.Username,
                 Email = userVM.Email,
                 FirstName = userVM.FirstName,
                 LastName = userVM.LastName,
@@ -198,16 +199,6 @@ namespace Auth.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        public async Task<IActionResult> Delete(string userId)
-        {
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user == null) return NotFound();
-
-            await _userManager.DeleteAsync(user);
-
-            foreach (var role in _userManager.GetRolesAsync(user).Result)
-                _userManager.RemoveFromRoleAsync(user, role);
-            return RedirectToAction(nameof(Index));
-        }
+       
     }
 }
