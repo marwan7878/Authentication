@@ -6,9 +6,14 @@
 }
 <h1>Users</h1>
 <a class="btn btn-primary" asp-controller="Users" asp-action="Create">Add User</a>
+
 <div id="alert" class="alert alert-danger mt-2 p-2 d-none" role="alert">
     User deleted.
 </div>
+<div id="reject-alert" class="alert alert-danger mt-2 p-2 d-none" role="alert">
+    Sorry , you can't delete your user.
+</div>
+
 <table class="table table-striped mt-4">
     <thead>
         <tr class="bg-primary text-white">
@@ -31,7 +36,7 @@
                 <td>@string.Join(" , ",user.Roles.ToList())</td>
                 <td>
                     <a class="btn btn-secondary" asp-controller="Users" asp-action="Edit" asp-route-UserId="@user.Id">Edit</a>
-                    <a href="javascript:;" class="btn btn-danger js-delete" data-id="@user.Id" disabled>Delete</a>
+                    <button id="deleteBtn" data-flag="@user.IsMine" class="btn btn-danger js-delete" data-id="@user.Id">Delete</button>
                 </td>
             </tr>
         }
@@ -41,6 +46,13 @@
 
 @section Scripts{
     <script>
+        let btnn = document.getElementById("deleteBtn")
+        window.onload = function () {
+            if (btnn.dataset.flag) {
+                btnn.disabled = btnn.dataset.flag
+            }
+        }
+
         $(document).ready(function () {
             $('.js-delete').on('click', function () {
                 var btn = $(this);
@@ -63,9 +75,14 @@
                             $.ajax({
                                 url: '/api/Users/delete' + '?userId=' + btn.data('id'),
                                 method:'DELETE',
-                                success: function () {
-                                    btn.parents('tr').fadeOut();
-                                    $('#alert').removeClass('d-none');
+                                success: function (result) {
+                                    if (!result) {
+                                        $('#reject-alert').removeClass('d-none');
+                                    }
+                                    else {
+                                        btn.parents('tr').fadeOut();
+                                        $('#alert').removeClass('d-none');
+                                    }
                                 }
                             })
                         }

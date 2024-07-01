@@ -3,10 +3,7 @@ using Auth.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
-using System.Net.Mail;
-using System.Security.Cryptography.Xml;
 
 namespace Auth.Controllers
 {
@@ -31,7 +28,8 @@ namespace Auth.Controllers
                 LastName = user.LastName,
                 Username = user.UserName,
                 Email = user.Email,
-                Roles = _userManager.GetRolesAsync(user).Result
+                Roles = _userManager.GetRolesAsync(user).Result,
+                IsMine = user.Id == _userManager.GetUserId(HttpContext.User)
             }).ToListAsync();
 
             return View(users);
