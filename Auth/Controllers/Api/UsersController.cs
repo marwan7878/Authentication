@@ -7,7 +7,7 @@ namespace Auth.Controllers.Api
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize("Admin")]
+    [Authorize(Roles ="Admin")]
     public class UsersController:ControllerBase
     {
         private readonly UserManager<ApplicationUser> _userManager;
@@ -23,7 +23,7 @@ namespace Auth.Controllers.Api
             //if (user == null) return NotFound();
 
             //var result = await _userManager.DeleteAsync(user);
-            //if(!result.Succeeded)
+            //if (!result.Succeeded)
             //{
             //    throw new Exception();
             //}
