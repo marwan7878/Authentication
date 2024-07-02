@@ -8,19 +8,20 @@ namespace Auth.Services
     {
         public async Task SendEmailAsync(string email, string subject, string htmlMessage)
         {
-            var fromEmail = "marooo7878@outlook.com";
-            var fromPassword = "159357MarawaN@";
+            //var fromEmail = "Marooo7878@outlook.com";
+            //var fromPassword = "159357MarawaN@";
+            var fromEmail = "marwanmohamed7887@gmail.com";
+            var fromPassword = "159357MaraWAN";
 
             var message = new MailMessage();
             message.From = new MailAddress(fromEmail);
             message.Subject = subject;
             message.To.Add(email);
-            message.Body = $"<html><body>htmlMessage</body></html>";
+            message.Body = $"<html><body>{htmlMessage}</body></html>";
             message.IsBodyHtml = true;
 
-            var smtpClient = new SmtpClient("smtp-mail.outlook.com")
+            var smtpClient = new SmtpClient("smtp-mail.gmail.com",587)
             {
-                Port = 587,
                 Credentials = new NetworkCredential(fromEmail,fromPassword),
                 EnableSsl = true
             };
