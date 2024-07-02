@@ -48,11 +48,14 @@
     <script>
         let btnn = document.getElementById("deleteBtn")
         window.onload = function () {
-            if (btnn.dataset.flag) {
-                btnn.disabled = btnn.dataset.flag
-            }
+            // Iterate over all delete buttons
+            document.querySelectorAll('.js-delete').forEach(function (btnn) {
+                if (btnn.dataset.flag === 'True') {
+                    btnn.disabled = true;
+                }
+            });
         }
-
+        
         $(document).ready(function () {
             $('.js-delete').on('click', function () {
                 var btn = $(this);
