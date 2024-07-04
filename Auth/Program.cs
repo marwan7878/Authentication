@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using System.Configuration;
 using System.Text;
 
 namespace Auth
@@ -29,7 +28,7 @@ namespace Auth
 			{
 				options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
 				options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-			}).AddJwtBearer(o=>
+            }).AddJwtBearer(o=>
 			{
 				o.RequireHttpsMetadata = false;
 				o.SaveToken = false;
@@ -45,7 +44,9 @@ namespace Auth
 				};
 			}
 			);
-			builder.Services.AddIdentity<ApplicationUser,IdentityRole>(/*options => options.SignIn.RequireConfirmedAccount=true*/)
+
+
+            builder.Services.AddIdentity<ApplicationUser,IdentityRole>(/*options => options.SignIn.RequireConfirmedAccount=true*/)
 				.AddEntityFrameworkStores<ApplicationDbContext>()
 				.AddDefaultUI()
 				.AddDefaultTokenProviders();

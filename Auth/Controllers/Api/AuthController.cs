@@ -1,6 +1,9 @@
 ﻿using Auth.Models;
 using Auth.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Auth.Controllers.Api
 {
@@ -16,7 +19,7 @@ namespace Auth.Controllers.Api
 
         [Route("register")]
         [HttpPost]
-        public async Task<IActionResult> Register([FromBody] Register model)
+        public async Task<IActionResult> RegisterAsync([FromBody] Register model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -26,6 +29,36 @@ namespace Auth.Controllers.Api
                 return BadRequest(result.Message);
 
             return Ok(result);
+        }
+        
+        [Route("token")]
+        [HttpGet]
+        public async Task<IActionResult> GetTokenAsync([FromBody] TokenRequest model)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            
+            var result = await _authService.GetTokenAsync(model);
+
+            if(!result.IsAuthenticated)
+                return BadRequest(result.Message);
+
+            return Ok(result);
+        }
+        [Route("assignRole")]
+        [HttpPost]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(Roles ="Admin")]
+        public async Task<IActionResult> AssignRoleAsync([FromBody] AssignRole model)
+        {
+            if(!ModelState.IsValid) return BadRequest(ModelState);
+
+            var result = await _authService.AssignRoleAsync(model);
+
+            if (!result.IsNullOrEmpty())
+                return BadRequest(result);
+            return Ok(model);
+            
         }
     }
 }
