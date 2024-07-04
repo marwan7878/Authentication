@@ -2,8 +2,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Net;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 
 namespace Auth.Controllers.Api
@@ -14,6 +12,7 @@ namespace Auth.Controllers.Api
     public class UsersController:Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
+        
         public UsersController(UserManager<ApplicationUser> userManager)
         {
             _userManager = userManager;
@@ -39,7 +38,7 @@ namespace Auth.Controllers.Api
             }
             return Ok(true);
         }
-
+        
     }
 }
 

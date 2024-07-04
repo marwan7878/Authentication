@@ -1,8 +1,13 @@
+using Auth.Helpers;
 using Auth.Models;
 using Auth.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Configuration;
+using System.Text;
 
 namespace Auth
 {
@@ -18,7 +23,29 @@ namespace Auth
 				options.UseSqlServer(connectionString));
 			builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-			builder.Services.AddIdentity<ApplicationUser,IdentityRole>(options => options.SignIn.RequireConfirmedAccount=true)
+			builder.Services.Configure<JWT>(builder.Configuration.GetSection("JWT"));
+			builder.Services.AddScoped<IAuthService, AuthService>();
+			builder.Services.AddAuthentication(options =>
+			{
+				options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+				options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+			}).AddJwtBearer(o=>
+			{
+				o.RequireHttpsMetadata = false;
+				o.SaveToken = false;
+				o.TokenValidationParameters = new TokenValidationParameters
+				{
+					ValidateIssuerSigningKey = true,
+					ValidateIssuer = true,
+					ValidateAudience = true,
+					ValidateLifetime = true,
+					ValidIssuer = builder.Configuration["JWT:Issuer"],
+                    ValidAudience = builder.Configuration["JWT:Audience"],
+					IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"]))
+				};
+			}
+			);
+			builder.Services.AddIdentity<ApplicationUser,IdentityRole>(/*options => options.SignIn.RequireConfirmedAccount=true*/)
 				.AddEntityFrameworkStores<ApplicationDbContext>()
 				.AddDefaultUI()
 				.AddDefaultTokenProviders();
@@ -27,13 +54,17 @@ namespace Auth
 
 			builder.Services.AddControllersWithViews();
 
-			var app = builder.Build();
+            builder.Services.AddSwaggerGen();
+
+            var app = builder.Build();
 
 			// Configure the HTTP request pipeline.
 			if (app.Environment.IsDevelopment())
 			{
 				app.UseMigrationsEndPoint();
-			}
+                app.UseSwagger();
+                app.UseSwaggerUI();
+            }
 			else
 			{
 				app.UseExceptionHandler("/Home/Error");
