@@ -47,6 +47,7 @@ namespace Auth.Controllers.Api
         }
         [Route("assignRole")]
         [HttpPost]
+        //this is important line that make error
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [Authorize(Roles ="Admin")]
         public async Task<IActionResult> AssignRoleAsync([FromBody] AssignRole model)

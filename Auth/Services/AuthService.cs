@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using NuGet.Common;
+using System.ComponentModel.DataAnnotations;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Mail;
 using System.Security.Claims;
@@ -66,6 +67,9 @@ namespace Auth.Services
             var authModel = new Authentication();
 
             var user = await _userManager.FindByEmailAsync(model.Email);
+            user = await _userManager.FindByNameAsync(model.Email);
+            
+
 
             if(user == null || !await _userManager.CheckPasswordAsync(user,model.Password))
             {
